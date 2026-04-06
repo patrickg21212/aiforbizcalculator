@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Calculator from '../components/Calculator.tsx';
+---
+
+<Base title="AI Automation Calculator | Free Business Assessment">
+  <Header />
+  <Calculator client:load />
+</Base>

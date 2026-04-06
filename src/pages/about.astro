@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base title="About | AI for Biz Calculator">
+  <Header />
+  <main class="container" style="padding-top: 100px; padding-bottom: 60px;">
+    <h1 class="text-3xl font-bold mb-6">About This Tool</h1>
+    <div style="color: var(--color-text-secondary); line-height: 1.8; font-size: 0.95rem; max-width: 640px;">
+      <p>
+        The AI for Biz Calculator was built by
+        <a href="https://epiphanydynamics.ai" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand-primary); font-weight: 600; text-decoration: none;">
+          Epiphany Dynamics
+        </a>, an AI automation agency that helps service businesses find and implement the right AI tools for their operations.
+      </p>
+
+      <p class="mt-4">
+        We built this free tool because most business owners know AI is important but don't know where to start. Generic advice doesn't help. What helps is specific, actionable recommendations tailored to your industry, team size, and pain points.
+      </p>
+
+      <p class="mt-4">
+        The calculator cross-references your answers against a database of 35+ proven automations and AI frameworks, filtered by your industry and situation. The result is a personalized business report you can actually act on.
+      </p>
+
+      <h2 class="text-xl font-bold mt-8 mb-3" style="color: var(--color-text-primary);">Want Human Help?</h2>
+      <p>
+        If your report shows opportunities you'd like help implementing,
+        <a href="https://epiphanydynamics.ai/book" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand-primary); font-weight: 600; text-decoration: none;">
+          book a free 30-minute AI Operations Audit
+        </a>. We'll review your results together and build an implementation plan specific to your business. No obligation, no pressure.
+      </p>
+    </div>
+  </main>
+  <Footer />
+</Base>
