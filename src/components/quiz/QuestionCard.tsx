@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Question, UserAnswers } from '../../lib/types';
+import { QuestionImage } from '../../lib/sectionIllustrations';
 
 interface Props {
   question: Question;
@@ -85,7 +86,7 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
       </div>
 
       {/* Progress bar */}
-      <div className="progress-track" style={{ marginBottom: 32 }}>
+      <div className="progress-track" style={{ marginBottom: 24 }}>
         <motion.div
           className="progress-fill"
           initial={{ width: `${Math.max(progress - 8, 0)}%` }}
@@ -93,6 +94,16 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
           transition={{ type: 'spring', stiffness: 80, damping: 18 }}
         />
       </div>
+
+      {/* Image — full width on mobile, stacked above question */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="q-image-wrap"
+      >
+        <QuestionImage questionId={question.id} />
+      </motion.div>
 
       {/* Section label */}
       <motion.div
@@ -104,8 +115,9 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: 'var(--color-brand-primary)',
+          color: 'var(--color-text-muted)',
           marginBottom: 8,
+          marginTop: 16,
         }}
       >
         {question.section}
@@ -113,7 +125,7 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
 
       {/* Question text */}
       <motion.h2
-        style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, marginBottom: 8, lineHeight: 1.25 }}
+        style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 700, marginBottom: 8, lineHeight: 1.25 }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
@@ -143,10 +155,10 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
         <motion.div
           style={{
             display: question.id === 'industry' ? 'grid' : 'flex',
-            gridTemplateColumns: question.id === 'industry' ? 'repeat(auto-fill, minmax(220px, 1fr))' : undefined,
+            gridTemplateColumns: question.id === 'industry' ? 'repeat(auto-fill, minmax(180px, 1fr))' : undefined,
             flexDirection: question.id === 'industry' ? undefined : 'column',
             gap: 10,
-            marginTop: 20,
+            marginTop: 16,
             flex: 1,
             overflowY: 'auto',
           }}
@@ -189,8 +201,8 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
                   textAlign: 'left',
                   width: '100%',
                   ...(isConfirming ? {
-                    borderColor: 'var(--color-brand-primary)',
-                    boxShadow: '0 0 24px rgba(59, 130, 246, 0.25)',
+                    borderColor: 'var(--color-accent)',
+                    boxShadow: 'var(--shadow-elevated)',
                   } : {}),
                 }}
               >
@@ -202,7 +214,7 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
                   <AnimatePresence>
                     {isSelected && !isConfirming && (
                       <motion.span
-                        style={{ marginLeft: 'auto', color: 'var(--color-brand-primary)', flexShrink: 0 }}
+                        style={{ marginLeft: 'auto', color: 'var(--color-accent)', flexShrink: 0 }}
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
@@ -220,16 +232,14 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
 
       {/* Scale */}
       {isScale && question.scale && (
-        <div style={{ marginTop: 32, flex: 1 }}>
+        <div style={{ marginTop: 24, flex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <motion.span
               key={scaleValue}
               style={{
                 fontSize: '3.5rem',
                 fontWeight: 800,
-                background: 'linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-accent))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'var(--color-text-primary)',
               }}
               initial={{ scale: 0.9, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -248,7 +258,7 @@ export function QuestionCard({ question, questionNumber, totalQuestions, onAnswe
             step={1}
             value={scaleValue}
             onChange={e => setScaleValue(Number(e.target.value))}
-            style={{ width: '100%', accentColor: 'var(--color-brand-primary)' }}
+            style={{ width: '100%', accentColor: 'var(--color-accent)' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
             <span>{question.scale.minLabel}</span>

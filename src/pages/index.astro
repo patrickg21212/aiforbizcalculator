@@ -4,187 +4,200 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<Base title="AI for Biz Calculator | Free AI Automation Assessment for Your Business">
+<Base title="AI for Biz Calculator | Free AI Automation Calculator for Your Business">
   <Header />
 
   <main style="padding-top: 72px;">
+
     <!-- Hero -->
-    <section class="container flex flex-col items-center text-center py-20 md:py-28">
-      <!-- Badge -->
-      <div
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium mb-8"
-        style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);"
-      >
-        <span class="w-2 h-2 rounded-full inline-block animate-pulse-glow" style="background: var(--color-brand-primary);"></span>
-        <span style="color: var(--color-text-secondary);">Free &middot; No signup required &middot; 3 minutes</span>
+    <section style="min-height: calc(100dvh - 72px); display: flex; align-items: center; position: relative; overflow: hidden;">
+
+      <!-- Hero background image -->
+      <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+        <img
+          src="/images/hero-bg.png"
+          alt=""
+          style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;"
+        />
+        <!-- Gradient overlay so text is readable on left -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(90deg, var(--color-bg-base) 35%, transparent 70%);"></div>
       </div>
 
-      <!-- Headline -->
-      <h1
-        class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight"
-        style="letter-spacing: -0.03em; text-wrap: balance;"
-      >
-        Find Out Exactly Where
-        <span style="background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-          AI Can Save You Money
-        </span>
-      </h1>
+      <div class="container-wide" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; padding: 60px 20px;">
 
-      <!-- Subhead -->
-      <p
-        class="text-lg md:text-xl max-w-2xl mb-10"
-        style="color: var(--color-text-secondary); line-height: 1.7; text-wrap: pretty;"
-      >
-        Answer a few questions about your business and get a detailed, personalized
-        report showing the exact automations and AI systems that will have the
-        biggest impact on your bottom line.
-      </p>
+        <!-- Left: Copy -->
+        <div>
+          <h1 style="font-size: clamp(2.6rem, 5vw, 3.8rem); line-height: 1.0; margin-bottom: 20px; text-wrap: balance;">
+            Find Out Where AI Saves You Money
+          </h1>
 
-      <!-- CTA -->
-      <a href="/calculator" class="btn-primary text-lg px-10 py-4">
-        Start Your Free Assessment
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/>
-          <path d="M12 5l7 7-7 7"/>
-        </svg>
-      </a>
+          <p style="color: var(--color-text-secondary); font-size: 1.1rem; line-height: 1.7; font-weight: 300; margin-bottom: 32px; max-width: 460px;">
+            Answer a few questions about your business and get a personalized
+            report with ranked automations, estimated ROI, and an implementation roadmap.
+          </p>
 
-      <!-- Trust line -->
-      <p class="mt-5 text-sm" style="color: var(--color-text-muted);">
-        No email required to start &middot; Instant personalized report
-      </p>
+          <a href="/calculator" class="btn-primary" style="font-size: 1.05rem; padding: 16px 40px;">
+            Start the Calculator
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: 14px;">
+            Free &middot; No signup &middot; Takes 3 minutes
+          </p>
+        </div>
+
+        <!-- Right: Report preview mockup -->
+        <div style="display: flex; justify-content: center;">
+          <div style="width: 100%; max-width: 380px; transform: rotate(1deg);">
+            <!-- Fake report card -->
+            <div style="background: #ffffff; border: 1px solid rgba(5,5,5,0.1); border-radius: var(--radius-xl); padding: 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);">
+              <div style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: 16px;">Your AI Business Report</div>
+
+              <!-- Top metrics -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                <div style="background: var(--color-accent); border-radius: var(--radius-md); padding: 12px; color: #f0efeb;">
+                  <div style="font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(240,239,235,0.7); margin-bottom: 4px;">Recoverable / Year</div>
+                  <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700;">$127,400</div>
+                </div>
+                <div style="background: var(--color-accent); border-radius: var(--radius-md); padding: 12px; color: #f0efeb;">
+                  <div style="font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(240,239,235,0.7); margin-bottom: 4px;">Inefficiency Cost</div>
+                  <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700;">$41,600/yr</div>
+                </div>
+              </div>
+
+              <!-- Fake recommendations -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                {[
+                  { icon: '📞', name: 'AI Phone Receptionist', savings: '$2,100/mo' },
+                  { icon: '💬', name: 'Website Chat Agent', savings: '$1,450/mo' },
+                  { icon: '📅', name: 'Smart Scheduling', savings: '$890/mo' },
+                ].map(item => (
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--color-bg-base); border-radius: var(--radius-md); border: 1px solid rgba(5,5,5,0.06);">
+                    <span style="font-size: 1.1rem;">{item.icon}</span>
+                    <span style="font-size: 0.85rem; font-weight: 500; color: var(--color-text-primary); flex: 1;">{item.name}</span>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-inverse); background: var(--color-accent); padding: 2px 8px; border-radius: var(--radius-full); white-space: nowrap;">{item.savings}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(5,5,5,0.06); text-align: center;">
+                <span style="font-size: 0.75rem; color: var(--color-text-muted);">+ Payback periods, Roadmap, AI Agent Opportunities...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- What You Get -->
-    <section style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border-default); border-bottom: 1px solid var(--color-border-default);">
-      <div class="container-wide py-20">
-        <h2 class="text-2xl md:text-3xl font-bold text-center mb-4">
+    <!-- What you get — dark section -->
+    <section class="section-dark">
+      <div class="container-wide" style="padding: 80px 20px;">
+        <h2 style="text-align: center; font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 12px; color: #f0efeb;">
           What You'll Get
         </h2>
-        <p class="text-center mb-12 max-w-lg mx-auto" style="color: var(--color-text-secondary);">
-          A real business report, not a generic quiz result. Specific to your industry, your size, and your pain points.
+        <p style="text-align: center; color: #a1a1aa; font-size: 1.05rem; font-weight: 300; margin-bottom: 48px; max-width: 480px; margin-left: auto; margin-right: auto;">
+          Not a generic result. A real report calculated for your business.
         </p>
 
-        <div class="grid md:grid-cols-3 gap-6">
-          <!-- Card 1 -->
-          <div class="card flex flex-col items-center text-center">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); border: 1px solid rgba(59,130,246,0.2);">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold mb-2">AI Readiness Score</h3>
-            <p class="text-sm" style="color: var(--color-text-secondary);">
-              See exactly where your business stands on AI adoption compared to others in your industry.
+        <div class="grid md:grid-cols-3 gap-8">
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 28px;">
+            <div style="font-size: 2rem; margin-bottom: 14px;">💰</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px; color: #f0efeb; font-family: 'Space Grotesk', sans-serif;">Financial Diagnostics</h3>
+            <p style="font-size: 0.95rem; color: #a1a1aa; font-weight: 300; line-height: 1.65;">
+              Real dollar amounts: annual inefficiency cost, leads lost per month, no-show revenue loss, and total recoverable value.
             </p>
           </div>
 
-          <!-- Card 2 -->
-          <div class="card flex flex-col items-center text-center">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.2);">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M9 12l2 2 4-4"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold mb-2">Automation Roadmap</h3>
-            <p class="text-sm" style="color: var(--color-text-secondary);">
-              Get a prioritized list of specific automations ranked by ROI, with estimated time and cost savings.
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 28px;">
+            <div style="font-size: 2rem; margin-bottom: 14px;">⚡</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px; color: #f0efeb; font-family: 'Space Grotesk', sans-serif;">Ranked Automations</h3>
+            <p style="font-size: 0.95rem; color: #a1a1aa; font-weight: 300; line-height: 1.65;">
+              Specific tools and systems matched to your industry, pain points, and goals. Each with monthly savings, cost, and payback period.
             </p>
           </div>
 
-          <!-- Card 3 -->
-          <div class="card flex flex-col items-center text-center">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.2);">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v6l4 2"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold mb-2">Implementation Timeline</h3>
-            <p class="text-sm" style="color: var(--color-text-secondary);">
-              A clear "start here, then this" roadmap tailored to your budget and technical comfort level.
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 28px;">
+            <div style="font-size: 2rem; margin-bottom: 14px;">🗺️</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px; color: #f0efeb; font-family: 'Space Grotesk', sans-serif;">Implementation Roadmap</h3>
+            <p style="font-size: 0.95rem; color: #a1a1aa; font-weight: 300; line-height: 1.65;">
+              A phased plan: quick wins first, then core systems, then advanced optimization. Matches your comfort level.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="container-wide py-20">
-      <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">
-        How It Works
-      </h2>
-
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="flex flex-col items-center text-center">
-          <div
-            class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4"
-            style="background: rgba(59, 130, 246, 0.1); color: var(--color-brand-primary); border: 2px solid rgba(59, 130, 246, 0.3);"
-          >
-            1
-          </div>
-          <h3 class="text-lg font-bold mb-2">Answer Questions</h3>
-          <p class="text-sm" style="color: var(--color-text-secondary);">
-            Tell us about your business, team size, current tools, and biggest pain points. Takes about 3 minutes.
-          </p>
-        </div>
-
-        <div class="flex flex-col items-center text-center">
-          <div
-            class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4"
-            style="background: rgba(16, 185, 129, 0.1); color: var(--color-brand-accent); border: 2px solid rgba(16, 185, 129, 0.3);"
-          >
-            2
-          </div>
-          <h3 class="text-lg font-bold mb-2">We Analyze</h3>
-          <p class="text-sm" style="color: var(--color-text-secondary);">
-            Our engine cross-references your answers against 30+ proven automations and AI frameworks for your industry.
-          </p>
-        </div>
-
-        <div class="flex flex-col items-center text-center">
-          <div
-            class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4"
-            style="background: rgba(245, 158, 11, 0.1); color: var(--color-brand-warm); border: 2px solid rgba(245, 158, 11, 0.3);"
-          >
-            3
-          </div>
-          <h3 class="text-lg font-bold mb-2">Get Your Report</h3>
-          <p class="text-sm" style="color: var(--color-text-secondary);">
-            Receive a detailed business report with specific recommendations, ROI estimates, and a prioritized action plan.
-          </p>
-        </div>
-      </div>
-
-      <div class="flex justify-center mt-12">
-        <a href="/calculator" class="btn-primary">
-          Start Now &mdash; It's Free
-        </a>
-      </div>
-    </section>
-
-    <!-- Industries -->
-    <section style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border-default); border-bottom: 1px solid var(--color-border-default);">
-      <div class="container-wide py-20">
-        <h2 class="text-2xl md:text-3xl font-bold text-center mb-4">
-          Works for Every Industry
+    <!-- How it works — light, simple -->
+    <section>
+      <div class="container-wide" style="padding: 80px 20px;">
+        <h2 style="text-align: center; font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 48px;">
+          How It Works
         </h2>
-        <p class="text-center mb-10 max-w-lg mx-auto" style="color: var(--color-text-secondary);">
-          Our recommendations are tailored to how your specific type of business actually operates.
-        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; max-width: 720px; margin: 0 auto;">
+          <!-- Step 1 -->
+          <div style="text-align: center; padding: 0 20px; position: relative;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-accent); color: var(--color-text-inverse); display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0 auto 16px;">
+              1
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Answer</h3>
+            <p style="font-size: 0.9rem; color: var(--color-text-secondary); font-weight: 300; line-height: 1.5;">
+              16 inputs about your business, team, and goals.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div style="text-align: center; padding: 0 20px; border-left: 1px solid var(--color-border-default); border-right: 1px solid var(--color-border-default);">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-accent); color: var(--color-text-inverse); display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0 auto 16px;">
+              2
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Analyze</h3>
+            <p style="font-size: 0.9rem; color: var(--color-text-secondary); font-weight: 300; line-height: 1.5;">
+              We match against 35+ automations for your industry.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div style="text-align: center; padding: 0 20px;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-accent); color: var(--color-text-inverse); display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0 auto 16px;">
+              3
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Report</h3>
+            <p style="font-size: 0.9rem; color: var(--color-text-secondary); font-weight: 300; line-height: 1.5;">
+              Get your personalized business report instantly.
+            </p>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 48px;">
+          <a href="/calculator" class="btn-primary" style="padding: 16px 40px; font-size: 1.05rem;">
+            Start Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Industries — cream surface -->
+    <section style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border-default);">
+      <div class="container-wide" style="padding: 64px 20px;">
+        <h2 style="text-align: center; font-size: 1.5rem; margin-bottom: 28px;">
+          Tailored to Your Industry
+        </h2>
 
         <div class="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
           {[
-            'Med Spa', 'Dental', 'Chiropractic', 'Veterinary', 'Salon & Barbershop',
-            'Fitness & Gym', 'Restaurant', 'Home Services', 'Real Estate',
-            'Legal', 'Accounting', 'Insurance', 'Auto Repair', 'Cleaning Service',
-            'Property Management', 'E-Commerce', 'Photography', 'Event Planning',
-            'Daycare', 'Consulting', 'And More...'
+            'Med Spa', 'Dental', 'Chiropractic', 'Veterinary', 'Salon',
+            'Fitness', 'Restaurant', 'Home Services', 'Real Estate',
+            'Legal', 'Accounting', 'Insurance', 'Auto Repair', 'Cleaning',
+            'Property Mgmt', 'E-Commerce', 'Photography', 'Events',
+            'Daycare', 'Consulting', 'Construction', 'Landscaping',
+            'Marketing Agency', 'And More'
           ].map(industry => (
             <span
-              class="px-4 py-2 rounded-full text-sm"
-              style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-default); color: var(--color-text-secondary);"
+              style="padding: 8px 18px; border-radius: var(--radius-full); font-size: 0.9rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border-default); color: var(--color-text-primary); font-weight: 400; box-shadow: var(--shadow-card);"
             >
               {industry}
             </span>
@@ -193,23 +206,19 @@ import Footer from '../components/Footer.astro';
       </div>
     </section>
 
-    <!-- Final CTA -->
-    <section class="container py-20 text-center">
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">
-        Ready to See What AI Can Do for Your Business?
-      </h2>
-      <p class="mb-8 max-w-lg mx-auto" style="color: var(--color-text-secondary);">
-        No signup. No sales pitch. Just a clear picture of where automation fits in your business.
-      </p>
-      <a href="/calculator" class="btn-primary text-lg px-10 py-4">
-        Take the Assessment
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/>
-          <path d="M12 5l7 7-7 7"/>
-        </svg>
-      </a>
-    </section>
   </main>
 
   <Footer />
 </Base>
+
+<style>
+  @media (max-width: 768px) {
+    section:first-of-type > div.container-wide {
+      grid-template-columns: 1fr !important;
+      text-align: center;
+    }
+    section:first-of-type > div.container-wide > div:last-child {
+      display: none;
+    }
+  }
+</style>

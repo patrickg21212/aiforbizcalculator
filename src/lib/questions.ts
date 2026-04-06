@@ -1,4 +1,31 @@
-import type { Question } from './types';
+import type { Question, UserAnswers } from './types';
+
+// ============================================================
+// Industry clusters for conditional questions
+// ============================================================
+
+const APPOINTMENT_INDUSTRIES = new Set([
+  'medspa', 'dental', 'chiropractic', 'veterinary', 'optometry',
+  'mental_health', 'salon', 'fitness', 'massage', 'tattoo', 'pet',
+]);
+
+const FIELD_SERVICE_INDUSTRIES = new Set([
+  'home_services', 'cleaning', 'landscaping', 'construction', 'auto',
+]);
+
+const PROFESSIONAL_INDUSTRIES = new Set([
+  'legal', 'accounting', 'insurance', 'financial', 'consulting', 'marketing_agency',
+]);
+
+const RETAIL_INDUSTRIES = new Set(['ecommerce', 'restaurant']);
+
+const PROPERTY_INDUSTRIES = new Set(['real_estate', 'property_mgmt']);
+
+// ============================================================
+// QUESTIONS — with conditional branching
+// Each user sees 16 base + 2-4 conditional based on their path.
+// Every conditional question directly feeds the scoring engine.
+// ============================================================
 
 export const QUESTIONS: Question[] = [
   // ============================================================
@@ -72,6 +99,110 @@ export const QUESTIONS: Question[] = [
       { value: 'established', label: '$500K to $1M', icon: '💼' },
       { value: 'scaling', label: '$1M to $5M', icon: '🚀' },
       { value: 'mature', label: '$5M+', icon: '🏆' },
+    ],
+  },
+
+  // ── Conditional: Appointment-based industries ─────────────
+  {
+    id: 'appointment_reminders',
+    section: 'Your Operations',
+    question: 'How do you currently handle appointment reminders?',
+    subtitle: 'This directly impacts our scheduling automation recommendations.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => APPOINTMENT_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'none', label: 'We don\'t send reminders', score: 0 },
+      { value: 'manual', label: 'Someone calls or texts manually', score: 3 },
+      { value: 'auto_basic', label: 'Our booking system sends basic reminders', score: 7 },
+      { value: 'multi_channel', label: 'Multi-channel automated (text, email, phone)', score: 10 },
+    ],
+  },
+  {
+    id: 'noshow_rate',
+    section: 'Your Operations',
+    question: 'What\'s your typical no-show or last-minute cancellation rate?',
+    type: 'single',
+    showWhen: (a: UserAnswers) => APPOINTMENT_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'over_20', label: 'Over 20% — it\'s a real problem', score: 0 },
+      { value: '10_20', label: '10-20%', score: 3 },
+      { value: 'under_10', label: 'Under 10%', score: 7 },
+      { value: 'not_sure', label: 'Not sure, we don\'t track it', score: 4 },
+    ],
+  },
+
+  // ── Conditional: Field service industries ──────────────────
+  {
+    id: 'estimate_method',
+    section: 'Your Operations',
+    question: 'How do you create estimates or proposals for jobs?',
+    subtitle: 'This helps us match the right sales tools to your workflow.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => FIELD_SERVICE_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'verbal', label: 'Verbal or ballpark estimates on-site', score: 0 },
+      { value: 'spreadsheet', label: 'Handwritten or basic spreadsheet', score: 3 },
+      { value: 'template', label: 'Template-based but still manual', score: 6 },
+      { value: 'software', label: 'Software generates them automatically', score: 9 },
+    ],
+  },
+  {
+    id: 'job_dispatch',
+    section: 'Your Operations',
+    question: 'How are jobs assigned to your crew or technicians?',
+    type: 'single',
+    showWhen: (a: UserAnswers) => FIELD_SERVICE_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'myself', label: 'I handle everything myself', score: 0 },
+      { value: 'phone', label: 'Phone calls and texts to the team', score: 3 },
+      { value: 'calendar', label: 'Shared calendar or whiteboard', score: 5 },
+      { value: 'software', label: 'Dispatch software with routing', score: 9 },
+    ],
+  },
+
+  // ── Conditional: Professional services ─────────────────────
+  {
+    id: 'doc_time',
+    section: 'Your Operations',
+    question: 'How much time per week does your team spend on client documents?',
+    subtitle: 'Contracts, reports, proposals, filings, letters, etc.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => PROFESSIONAL_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'over_15h', label: 'Over 15 hours — it\'s a bottleneck', score: 0 },
+      { value: '5_15h', label: '5-15 hours', score: 3 },
+      { value: 'under_5h', label: 'Under 5 hours', score: 7 },
+      { value: 'templates', label: 'We have templates that speed this up', score: 9 },
+    ],
+  },
+
+  // ── Conditional: Retail / Restaurant ───────────────────────
+  {
+    id: 'catalog_management',
+    section: 'Your Operations',
+    question: 'How do you manage your product listings or menu?',
+    type: 'single',
+    showWhen: (a: UserAnswers) => RETAIL_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'manual', label: 'Manually updated one at a time', score: 0 },
+      { value: 'spreadsheet', label: 'Spreadsheet imports', score: 3 },
+      { value: 'platform', label: 'POS or platform manages most of it', score: 7 },
+    ],
+  },
+
+  // ── Conditional: Property ──────────────────────────────────
+  {
+    id: 'tenant_handling',
+    section: 'Your Operations',
+    question: 'How do you handle tenant or client requests?',
+    subtitle: 'Maintenance requests, questions, showings, etc.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => PROPERTY_INDUSTRIES.has(a.industry as string),
+    options: [
+      { value: 'phone_only', label: 'Phone calls and voicemail', score: 0 },
+      { value: 'email_forms', label: 'Email or online forms', score: 3 },
+      { value: 'portal', label: 'Tenant/client portal', score: 7 },
+      { value: 'automated', label: 'Automated system with routing and tracking', score: 9 },
     ],
   },
 
@@ -164,6 +295,42 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
+  // ── Conditional: Pain-specific follow-ups ──────────────────
+  {
+    id: 'lead_volume',
+    section: 'Pain Points',
+    question: 'How many new leads or inquiries come in per month?',
+    subtitle: 'This helps us estimate the ROI of lead management automation.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => {
+      const pains = a.biggest_pain;
+      return Array.isArray(pains) && pains.includes('lead_followup');
+    },
+    options: [
+      { value: 'low', label: 'Under 20', score: 2 },
+      { value: 'moderate', label: '20 to 50', score: 5 },
+      { value: 'high', label: '50 to 100', score: 8 },
+      { value: 'very_high', label: 'Over 100', score: 12 },
+    ],
+  },
+  {
+    id: 'appointment_volume',
+    section: 'Pain Points',
+    question: 'Roughly how many appointments per week does your business handle?',
+    subtitle: 'Higher volume means higher automation impact.',
+    type: 'single',
+    showWhen: (a: UserAnswers) => {
+      const pains = a.biggest_pain;
+      return Array.isArray(pains) && pains.includes('scheduling');
+    },
+    options: [
+      { value: 'low', label: 'Under 20', score: 2 },
+      { value: 'moderate', label: '20 to 50', score: 5 },
+      { value: 'high', label: '50 to 100', score: 8 },
+      { value: 'very_high', label: 'Over 100', score: 12 },
+    ],
+  },
+
   {
     id: 'hours_wasted',
     section: 'Pain Points',
@@ -242,20 +409,6 @@ export const QUESTIONS: Question[] = [
       { value: 'better_cx', label: 'Improve customer experience', icon: '⭐' },
       { value: 'scale', label: 'Scale without hiring more people', icon: '🚀' },
       { value: 'free_time', label: 'Free up my personal time', icon: '⏰' },
-    ],
-  },
-
-  {
-    id: 'budget',
-    section: 'Goals',
-    question: 'What could you invest monthly in tools that save you real time?',
-    type: 'single',
-    options: [
-      { value: 'free', label: 'I\'d try free tools only for now', score: 1 },
-      { value: 'low', label: 'Under $200/month', score: 4 },
-      { value: 'moderate', label: '$200 to $500/month', score: 8 },
-      { value: 'serious', label: '$500 to $2,000/month', score: 14 },
-      { value: 'whatever', label: 'Whatever it takes for clear ROI', score: 18 },
     ],
   },
 

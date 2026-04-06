@@ -1,109 +1,79 @@
-import type { UserAnswers, ScoreTier, ScoredAutomation, RoadmapPhase, ReportData } from './types';
+import type { UserAnswers, ScoredAutomation, RoadmapPhase, ReportData } from './types';
 import { AUTOMATIONS } from './automations';
 import { INDUSTRY_LABELS } from './questions';
+import { calculateMetrics, calculateAutomationROI } from './calculator';
 
 // ============================================================
-// SCORE TIERS
+// Resolve match reasons — tell the user WHY this was recommended
 // ============================================================
 
-const TIERS: ScoreTier[] = [
-  {
-    id: 'ai_leader',
-    label: 'AI Leader',
-    color: '#10b981',
-    tagline: 'Your business is already ahead of the curve.',
-    description: 'You have strong systems, openness to AI, and the infrastructure to implement advanced automation fast. The biggest wins for you are in optimization, agentic frameworks, and scaling what already works.',
-  },
-  {
-    id: 'ai_ready',
-    label: 'AI Ready',
-    color: '#3b82f6',
-    tagline: 'You have the foundation. Now it\'s time to build.',
-    description: 'Your business has the tools and mindset to adopt AI effectively. You\'re past the starting line and ready for targeted automations that deliver measurable ROI quickly.',
-  },
-  {
-    id: 'ai_curious',
-    label: 'AI Curious',
-    color: '#f59e0b',
-    tagline: 'You see the potential. The roadmap starts here.',
-    description: 'You know AI matters but haven\'t fully committed yet. That\'s actually an advantage: you can skip the mistakes early adopters made and go straight to what\'s proven to work in your industry.',
-  },
-  {
-    id: 'ai_starter',
-    label: 'AI Starter',
-    color: '#8b5cf6',
-    tagline: 'You\'re starting at exactly the right time.',
-    description: 'Starting fresh means no bad implementations to undo. The tools available today are better, cheaper, and more proven than even a year ago. A few focused moves will have an outsized impact.',
-  },
-];
+function getMatchReasons(auto: typeof AUTOMATIONS[0], answers: UserAnswers): string[] {
+  const reasons: string[] = [];
+  const industry = answers.industry as string;
+  const painPoints = (answers.biggest_pain as string[]) || [];
+  const goal = answers.primary_goal as string;
 
-// ============================================================
-// CALCULATE SCORE (0-100)
-// ============================================================
-
-export function calculateScore(answers: UserAnswers): number {
-  let raw = 0;
-
-  // Scored questions contribute directly
-  const scoredQuestions = ['booking_method', 'follow_up', 'after_hours', 'ai_experience', 'ai_trust', 'budget', 'timeline', 'hours_wasted', 'lost_customers'];
-
-  for (const qId of scoredQuestions) {
-    const val = answers[qId];
-    if (val === undefined) continue;
-
-    // Questions with score-per-option are stored via the question data
-    // We reconstruct scores here since we need to be self-contained
-    const scoreMap: Record<string, Record<string, number>> = {
-      booking_method: { phone: 0, website_form: 3, online_booking: 8, mixed: 5, marketplace: 6 },
-      follow_up: { nothing: 0, manual: 3, basic_email: 6, crm: 10 },
-      after_hours: { voicemail: 0, form: 3, answering_service: 5, chatbot: 9, na: 5 },
-      ai_experience: { none: 0, casual: 5, moderate: 15, advanced: 25 },
-      ai_trust: { never: 0, simple: 5, routine: 12, fully: 20 },
-      budget: { free: 1, low: 4, moderate: 8, serious: 14, whatever: 18 },
-      timeline: { research: 1, weeks: 4, fast: 9, yesterday: 14 },
-      hours_wasted: { few: 2, moderate: 6, significant: 10, heavy: 15, unknown: 8 },
-      lost_customers: { yes_definitely: 10, probably: 7, not_sure: 4, no: 1 },
-    };
-
-    const qMap = scoreMap[qId];
-    if (qMap && typeof val === 'string' && val in qMap) {
-      raw += qMap[val];
-    }
+  if (auto.industries.length > 0 && auto.industries.includes(industry)) {
+    reasons.push(`Matched to ${INDUSTRY_LABELS[industry] || industry} businesses`);
   }
 
-  // Tech comfort scale (1-10) contributes up to 10 points
-  const techComfort = answers.tech_comfort;
-  if (typeof techComfort === 'number') {
-    raw += techComfort;
+  const painLabels: Record<string, string> = {
+    answering_questions: 'repetitive customer questions',
+    scheduling: 'scheduling and no-shows',
+    lead_followup: 'cold lead follow-up',
+    data_entry: 'manual data entry',
+    content_creation: 'content creation',
+    onboarding: 'onboarding',
+    reviews: 'review management',
+    invoicing: 'invoicing and collections',
+    reporting: 'reporting',
+    hiring: 'hiring and staffing',
+  };
+  for (const p of auto.painPoints.filter(p => painPoints.includes(p))) {
+    reasons.push(`You flagged ${painLabels[p] || p} as a pain point`);
   }
 
-  // Tools count contributes (more tools = more ready)
-  const tools = answers.current_tools;
-  if (Array.isArray(tools)) {
-    const realTools = tools.filter(t => t !== 'none');
-    raw += Math.min(realTools.length * 2, 12);
+  const goalLabels: Record<string, string> = {
+    grow_revenue: 'growing revenue', reduce_costs: 'reducing costs',
+    better_cx: 'improving customer experience', scale: 'scaling without hiring',
+    free_time: 'freeing up your time',
+  };
+  const goalBoosts: Record<string, string[]> = {
+    grow_revenue: ['lead_scoring', 'crm_automation', 'retargeting_automation', 'ai_receptionist'],
+    reduce_costs: ['workflow_automation', 'document_ai', 'invoice_automation', 'content_engine'],
+    better_cx: ['ai_chat_widget', 'customer_support_ai', 'smart_scheduling', 'sms_automation'],
+    scale: ['hiring_automation', 'training_ai', 'workflow_automation', 'ai_receptionist'],
+    free_time: ['ai_receptionist', 'smart_scheduling', 'workflow_automation', 'content_engine'],
+  };
+  if (goalBoosts[goal]?.includes(auto.id)) {
+    reasons.push(`Aligns with your goal of ${goalLabels[goal] || goal}`);
   }
 
-  // Pain points count (more awareness = higher score)
-  const pains = answers.biggest_pain;
-  if (Array.isArray(pains)) {
-    raw += Math.min(pains.length * 2, 6);
+  // Conditional-answer reasons
+  const noshowRate = answers.noshow_rate as string;
+  if ((noshowRate === 'over_20' || noshowRate === '10_20') && ['waitlist_ai', 'sms_automation', 'smart_scheduling'].includes(auto.id)) {
+    reasons.push('Your no-show rate indicates significant recoverable revenue');
+  }
+  if ((['none', 'manual'].includes(answers.appointment_reminders as string)) && ['sms_automation', 'smart_scheduling'].includes(auto.id)) {
+    reasons.push('You have no automated appointment reminders');
+  }
+  if ((['verbal', 'spreadsheet'].includes(answers.estimate_method as string)) && auto.id === 'proposal_generator') {
+    reasons.push('Your current estimating process is manual');
+  }
+  if ((['myself', 'phone'].includes(answers.job_dispatch as string)) && auto.id === 'dispatch_optimization') {
+    reasons.push('Your job dispatch is manual, limiting capacity');
+  }
+  if ((['over_15h', '5_15h'].includes(answers.doc_time as string)) && ['document_ai', 'legal_doc_automation'].includes(auto.id)) {
+    reasons.push('Your team spends significant time on document processing');
+  }
+  if ((['voicemail', 'form'].includes(answers.after_hours as string)) && ['ai_receptionist', 'ai_chat_widget'].includes(auto.id)) {
+    reasons.push('You have no after-hours engagement system');
+  }
+  if ((['nothing', 'manual'].includes(answers.follow_up as string)) && ['email_nurture', 'crm_automation', 'lead_scoring'].includes(auto.id)) {
+    reasons.push('You have no automated follow-up system');
   }
 
-  // Max theoretical raw ~ 140. Normalize to 0-100
-  const normalized = Math.round(Math.min(100, (raw / 130) * 100));
-  return Math.max(5, normalized); // minimum 5 so nobody gets a zero
-}
-
-// ============================================================
-// GET TIER FROM SCORE
-// ============================================================
-
-export function getTier(score: number): ScoreTier {
-  if (score >= 75) return TIERS[0]; // AI Leader
-  if (score >= 50) return TIERS[1]; // AI Ready
-  if (score >= 25) return TIERS[2]; // AI Curious
-  return TIERS[3]; // AI Starter
+  return reasons;
 }
 
 // ============================================================
@@ -113,40 +83,23 @@ export function getTier(score: number): ScoreTier {
 export function getRecommendations(answers: UserAnswers): ScoredAutomation[] {
   const industry = answers.industry as string;
   const teamSize = answers.team_size as string;
-  const budget = answers.budget as string;
   const painPoints = (answers.biggest_pain as string[]) || [];
   const goal = answers.primary_goal as string;
 
   return AUTOMATIONS.map(auto => {
     let relevance = 0;
 
-    // Industry match (big boost for industry-specific, baseline for universal)
-    if (auto.industries.length === 0) {
-      relevance += 10; // universal
-    } else if (auto.industries.includes(industry)) {
-      relevance += 25; // industry-specific match
-    } else {
-      relevance -= 20; // not for this industry
-    }
+    if (auto.industries.length === 0) relevance += 10;
+    else if (auto.industries.includes(industry)) relevance += 25;
+    else relevance -= 20;
 
-    // Pain point match (biggest signal)
-    const painOverlap = auto.painPoints.filter(p => painPoints.includes(p));
-    relevance += painOverlap.length * 20;
+    relevance += auto.painPoints.filter(p => painPoints.includes(p)).length * 20;
 
-    // Team size filter
     if (auto.minTeamSize) {
       const sizeOrder = ['solo', 'small', 'medium', 'large', 'enterprise'];
-      const minIdx = sizeOrder.indexOf(auto.minTeamSize);
-      const actualIdx = sizeOrder.indexOf(teamSize);
-      if (actualIdx < minIdx) relevance -= 15;
+      if (sizeOrder.indexOf(teamSize) < sizeOrder.indexOf(auto.minTeamSize)) relevance -= 15;
     }
 
-    // Budget fit
-    if (auto.minBudget === 'moderate' && ['free', 'low'].includes(budget)) {
-      relevance -= 10;
-    }
-
-    // Goal alignment bonus
     const goalBoosts: Record<string, string[]> = {
       grow_revenue: ['lead_scoring', 'crm_automation', 'retargeting_automation', 'ai_receptionist'],
       reduce_costs: ['workflow_automation', 'document_ai', 'invoice_automation', 'content_engine'],
@@ -154,24 +107,62 @@ export function getRecommendations(answers: UserAnswers): ScoredAutomation[] {
       scale: ['hiring_automation', 'training_ai', 'workflow_automation', 'ai_receptionist'],
       free_time: ['ai_receptionist', 'smart_scheduling', 'workflow_automation', 'content_engine'],
     };
-    if (goalBoosts[goal]?.includes(auto.id)) {
-      relevance += 15;
-    }
+    if (goalBoosts[goal]?.includes(auto.id)) relevance += 15;
 
-    // Complexity match — lower complexity gets slight boost for less technical users
     const techComfort = typeof answers.tech_comfort === 'number' ? answers.tech_comfort : 5;
     if (auto.complexity === 'easy') relevance += 5;
     if (auto.complexity === 'advanced' && techComfort < 4) relevance -= 10;
 
-    return { ...auto, relevanceScore: relevance, priorityRank: 0 };
+    // All conditional answer boosts
+    const noshowRate = answers.noshow_rate as string;
+    if (['over_20', '10_20'].includes(noshowRate) && ['waitlist_ai', 'sms_automation', 'smart_scheduling'].includes(auto.id))
+      relevance += noshowRate === 'over_20' ? 25 : 15;
+
+    if (['none', 'manual'].includes(answers.appointment_reminders as string) && ['sms_automation', 'smart_scheduling'].includes(auto.id))
+      relevance += 15;
+
+    if (['verbal', 'spreadsheet'].includes(answers.estimate_method as string) && auto.id === 'proposal_generator')
+      relevance += 25;
+
+    if (['myself', 'phone'].includes(answers.job_dispatch as string) && auto.id === 'dispatch_optimization')
+      relevance += 25;
+
+    const docTime = answers.doc_time as string;
+    if (['over_15h', '5_15h'].includes(docTime) && ['document_ai', 'legal_doc_automation'].includes(auto.id))
+      relevance += docTime === 'over_15h' ? 25 : 15;
+
+    if (['manual', 'spreadsheet'].includes(answers.catalog_management as string) && ['ecommerce_product_ai', 'menu_optimization', 'inventory_ai'].includes(auto.id))
+      relevance += 20;
+
+    if (['phone_only', 'email_forms'].includes(answers.tenant_handling as string) && ['property_maintenance', 'ai_receptionist'].includes(auto.id))
+      relevance += 20;
+
+    const leadVol = answers.lead_volume as string;
+    if (['high', 'very_high'].includes(leadVol) && ['lead_scoring', 'crm_automation', 'email_nurture', 'ai_chat_widget'].includes(auto.id))
+      relevance += leadVol === 'very_high' ? 20 : 12;
+
+    const apptVol = answers.appointment_volume as string;
+    if (['high', 'very_high'].includes(apptVol) && ['smart_scheduling', 'waitlist_ai', 'sms_automation'].includes(auto.id))
+      relevance += apptVol === 'very_high' ? 20 : 12;
+
+    if (['voicemail', 'form'].includes(answers.after_hours as string) && ['ai_receptionist', 'ai_chat_widget'].includes(auto.id))
+      relevance += 15;
+
+    if (['nothing', 'manual'].includes(answers.follow_up as string) && ['email_nurture', 'crm_automation', 'lead_scoring'].includes(auto.id))
+      relevance += 15;
+
+    const matchReasons = getMatchReasons(auto, answers);
+    const roi = calculateAutomationROI(auto.monthlyCost, auto.estimatedSavings, answers);
+
+    return { ...auto, relevanceScore: relevance, priorityRank: 0, matchReasons, roi };
   })
-    .filter(a => a.relevanceScore > 0)
+    .filter(a => a.relevanceScore > 0 && a.matchReasons.length > 0)
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .map((a, i) => ({ ...a, priorityRank: i + 1 }));
 }
 
 // ============================================================
-// BUILD ROADMAP
+// BUILD ROADMAP — with cost/savings per phase
 // ============================================================
 
 export function buildRoadmap(recommendations: ScoredAutomation[]): RoadmapPhase[] {
@@ -181,31 +172,17 @@ export function buildRoadmap(recommendations: ScoredAutomation[]): RoadmapPhase[
 
   const phases: RoadmapPhase[] = [];
 
+  const sumCost = (items: ScoredAutomation[]) => items.reduce((s, i) => s + Math.round((i.roi.monthlyCostLow + i.roi.monthlyCostHigh) / 2), 0);
+  const sumSavings = (items: ScoredAutomation[]) => items.reduce((s, i) => s + i.roi.monthlySavingsEstimate, 0);
+
   if (easy.length > 0) {
-    phases.push({
-      phase: 1,
-      label: 'Quick Wins',
-      timeframe: 'Week 1-2',
-      items: easy,
-    });
+    phases.push({ phase: 1, label: 'Quick Wins', timeframe: 'Week 1-2', items: easy, phaseMonthlyCost: sumCost(easy), phaseMonthlySavings: sumSavings(easy) });
   }
-
   if (medium.length > 0) {
-    phases.push({
-      phase: 2,
-      label: 'Core Systems',
-      timeframe: 'Month 1-2',
-      items: medium,
-    });
+    phases.push({ phase: 2, label: 'Core Systems', timeframe: 'Month 1-2', items: medium, phaseMonthlyCost: sumCost(medium), phaseMonthlySavings: sumSavings(medium) });
   }
-
   if (advanced.length > 0) {
-    phases.push({
-      phase: 3,
-      label: 'Advanced Optimization',
-      timeframe: 'Month 3-6',
-      items: advanced,
-    });
+    phases.push({ phase: 3, label: 'Advanced Optimization', timeframe: 'Month 3-6', items: advanced, phaseMonthlyCost: sumCost(advanced), phaseMonthlySavings: sumSavings(advanced) });
   }
 
   return phases;
@@ -216,20 +193,18 @@ export function buildRoadmap(recommendations: ScoredAutomation[]): RoadmapPhase[
 // ============================================================
 
 export function generateReport(answers: UserAnswers): ReportData {
-  const score = calculateScore(answers);
-  const tier = getTier(score);
   const industry = answers.industry as string;
+  const metrics = calculateMetrics(answers);
   const allRecs = getRecommendations(answers);
   const automations = allRecs.filter(r => !r.isAgentic).slice(0, 6);
   const agenticFrameworks = allRecs.filter(r => r.isAgentic).slice(0, 4);
   const roadmap = buildRoadmap(allRecs.slice(0, 8));
 
   return {
-    score,
-    tier,
     industry,
     industryLabel: INDUSTRY_LABELS[industry] || industry,
     teamSize: answers.team_size as string,
+    metrics,
     automations,
     agenticFrameworks,
     roadmap,

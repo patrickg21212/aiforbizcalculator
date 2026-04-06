@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://aiforbizcalculator.online',
+  site: 'https://ai4bizcalculator.online',
   adapter: vercel(),
   integrations: [
     react(),

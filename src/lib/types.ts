@@ -18,6 +18,7 @@ export interface Question {
   options?: QuestionOption[];
   maxSelections?: number;
   scale?: { min: number; max: number; minLabel: string; maxLabel: string };
+  showWhen?: (answers: UserAnswers) => boolean;
 }
 
 export interface UserAnswers {
@@ -30,7 +31,6 @@ export type Phase = 'landing' | 'quiz' | 'calculating' | 'report';
 // Recommendation Engine Types
 // ============================================================
 
-export type ImpactLevel = 'high' | 'medium' | 'low';
 export type Complexity = 'easy' | 'medium' | 'advanced';
 export type AutomationCategory = 'communication' | 'scheduling' | 'marketing' | 'operations' | 'analytics' | 'sales' | 'support' | 'hr';
 
@@ -44,36 +44,39 @@ export interface Automation {
   complexity: Complexity;
   monthlyCost: string;
   icon: string;
-  industries: string[];       // which industries this applies to (empty = all)
-  painPoints: string[];       // which pain points trigger this
-  minTeamSize?: string;       // minimum team size tag
-  minBudget?: string;         // minimum budget tag
-  isAgentic: boolean;         // true = AI agent, false = simple automation
+  industries: string[];
+  painPoints: string[];
+  minTeamSize?: string;
+  minBudget?: string;
+  isAgentic: boolean;
 }
 
-export interface ReportData {
-  score: number;
-  tier: ScoreTier;
-  industry: string;
-  industryLabel: string;
-  teamSize: string;
-  automations: ScoredAutomation[];
-  agenticFrameworks: ScoredAutomation[];
-  roadmap: RoadmapPhase[];
-  answers: UserAnswers;
+// ── Calculated outputs ───────────────────────────────────
+
+export interface CalculatedMetrics {
+  frontDeskHourlyRate: number;             // basic reception/admin rate
+  hourlyLaborCost: number;                 // blended rate across all automatable roles
+  weeklyHoursLost: number;
+  annualInefficiencyCost: number;
+  estimatedLeadsLostPerMonth: number;
+  noshowRevenueLostPerYear: number;
+  totalRecoverablePerYear: number;
+  automationCoveragePercent: number;
+}
+
+export interface AutomationROI {
+  monthlyCostLow: number;
+  monthlyCostHigh: number;
+  monthlySavingsEstimate: number;
+  paybackDays: number;
+  annualNetSavings: number;
 }
 
 export interface ScoredAutomation extends Automation {
   relevanceScore: number;
   priorityRank: number;
-}
-
-export interface ScoreTier {
-  id: string;
-  label: string;
-  color: string;
-  tagline: string;
-  description: string;
+  matchReasons: string[];
+  roi: AutomationROI;
 }
 
 export interface RoadmapPhase {
@@ -81,4 +84,17 @@ export interface RoadmapPhase {
   label: string;
   timeframe: string;
   items: ScoredAutomation[];
+  phaseMonthlyCost: number;
+  phaseMonthlySavings: number;
+}
+
+export interface ReportData {
+  industry: string;
+  industryLabel: string;
+  teamSize: string;
+  metrics: CalculatedMetrics;
+  automations: ScoredAutomation[];
+  agenticFrameworks: ScoredAutomation[];
+  roadmap: RoadmapPhase[];
+  answers: UserAnswers;
 }

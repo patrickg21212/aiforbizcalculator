@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Phase, UserAnswers, ReportData } from '../lib/types';
 import { QUESTIONS } from '../lib/questions';
@@ -8,13 +8,20 @@ import { BusinessReport } from './report/BusinessReport';
 
 export default function Calculator() {
   const [phase, setPhase] = useState<Phase>('quiz');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentQuestionId, setCurrentQuestionId] = useState(QUESTIONS[0].id);
   const [answers, setAnswers] = useState<UserAnswers>({});
-  const [history, setHistory] = useState<number[]>([]);
+  const [history, setHistory] = useState<string[]>([]);
   const [report, setReport] = useState<ReportData | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
-  const currentQuestion = QUESTIONS[currentIndex];
+  // Compute active questions based on current answers (branching logic)
+  const activeQuestions = useMemo(() =>
+    QUESTIONS.filter(q => !q.showWhen || q.showWhen(answers)),
+    [answers]
+  );
+
+  const currentIndex = activeQuestions.findIndex(q => q.id === currentQuestionId);
+  const currentQuestion = currentIndex >= 0 ? activeQuestions[currentIndex] : activeQuestions[0];
 
   const scrollToTop = () => {
     topRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -24,13 +31,15 @@ export default function Calculator() {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
 
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= QUESTIONS.length) {
+    // Recompute active questions with the new answers to handle branching
+    const newActive = QUESTIONS.filter(q => !q.showWhen || q.showWhen(newAnswers));
+    const currentIdx = newActive.findIndex(q => q.id === questionId);
+
+    if (currentIdx + 1 >= newActive.length) {
       // All questions answered, generate report
       setPhase('calculating');
       scrollToTop();
 
-      // Simulate brief analysis time for UX feel
       setTimeout(() => {
         const reportData = generateReport(newAnswers);
         setReport(reportData);
@@ -38,21 +47,21 @@ export default function Calculator() {
         scrollToTop();
       }, 2500);
     } else {
-      setHistory(prev => [...prev, currentIndex]);
-      setCurrentIndex(nextIndex);
+      setHistory(prev => [...prev, questionId]);
+      setCurrentQuestionId(newActive[currentIdx + 1].id);
     }
-  }, [answers, currentIndex]);
+  }, [answers]);
 
   const handleBack = useCallback(() => {
     if (history.length === 0) return;
-    const prevIndex = history[history.length - 1];
+    const prevId = history[history.length - 1];
     setHistory(prev => prev.slice(0, -1));
-    setCurrentIndex(prevIndex);
+    setCurrentQuestionId(prevId);
   }, [history]);
 
   const handleRestart = useCallback(() => {
     setPhase('quiz');
-    setCurrentIndex(0);
+    setCurrentQuestionId(QUESTIONS[0].id);
     setAnswers({});
     setHistory([]);
     setReport(null);
@@ -67,7 +76,7 @@ export default function Calculator() {
             key={currentQuestion.id}
             question={currentQuestion}
             questionNumber={currentIndex + 1}
-            totalQuestions={QUESTIONS.length}
+            totalQuestions={activeQuestions.length}
             onAnswer={handleAnswer}
             onBack={handleBack}
             canGoBack={history.length > 0}
@@ -97,7 +106,7 @@ export default function Calculator() {
                 height: 80,
                 borderRadius: '50%',
                 border: '3px solid var(--color-bg-elevated)',
-                borderTopColor: 'var(--color-brand-primary)',
+                borderTopColor: 'var(--color-accent)',
               }}
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -147,7 +156,7 @@ export default function Calculator() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.3 + i * 0.6, type: 'spring' }}
-                    style={{ color: 'var(--color-brand-accent)' }}
+                    style={{ color: 'var(--color-text-primary)' }}
                   >
                     ✓
                   </motion.span>
