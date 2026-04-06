@@ -417,6 +417,23 @@ export function BusinessReport({ report, onRestart }: Props) {
           )}
         </motion.div>
 
+        {/* ── DISCLAIMER ────────────────────────────────────── */}
+        <div style={{
+          padding: '16px 20px', marginTop: 40,
+          borderTop: '1px solid var(--color-border-default)',
+          borderBottom: '1px solid var(--color-border-default)',
+        }}>
+          <p style={{
+            fontSize: '0.78rem', color: 'var(--color-text-muted)', lineHeight: 1.6,
+            margin: 0, textAlign: 'center', maxWidth: 600, marginLeft: 'auto', marginRight: 'auto',
+          }}>
+            All figures are estimates based on published industry benchmarks and the data you provided.
+            Actual results will vary based on your specific business operations, market conditions,
+            and implementation. This calculator is for informational purposes only and does not
+            constitute financial or professional advice.
+          </p>
+        </div>
+
         {/* ── CTA: BOOK AUDIT ──────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
