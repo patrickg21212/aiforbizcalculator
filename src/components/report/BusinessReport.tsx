@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { ReportData } from '../../lib/types';
 import { AutomationCard } from './AutomationCard';
@@ -81,34 +80,7 @@ function SectionDivider({ icon, title }: { icon: string; title: string }) {
 }
 
 export function BusinessReport({ report, onRestart }: Props) {
-  const [email, setEmail] = useState('');
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const m = report.metrics;
-
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.includes('@')) return;
-    setEmailStatus('sending');
-    try {
-      const res = await fetch('/api/capture', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          industry: report.industry,
-          industryLabel: report.industryLabel,
-          teamSize: report.teamSize,
-          annualInefficiencyCost: m.annualInefficiencyCost,
-          totalRecoverable: m.totalRecoverablePerYear,
-          topAutomations: report.automations.slice(0, 3).map(a => a.name),
-        }),
-      });
-      if (!res.ok) throw new Error();
-      setEmailStatus('sent');
-    } catch {
-      setEmailStatus('error');
-    }
-  };
 
   const goalLabels: Record<string, string> = {
     grow_revenue: 'Grow revenue', reduce_costs: 'Reduce costs',
@@ -369,53 +341,7 @@ export function BusinessReport({ report, onRestart }: Props) {
           ))}
         </div>
 
-        {/* ── EMAIL CAPTURE ────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          style={{
-            background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-strong)',
-            borderRadius: 'var(--radius-xl)', padding: 'clamp(24px, 4vw, 36px) clamp(16px, 3vw, 28px)', textAlign: 'center',
-            marginTop: 48, boxShadow: 'var(--shadow-elevated)',
-          }}
-        >
-          {emailStatus === 'sent' ? (
-            <>
-              <p style={{ fontWeight: 700, fontSize: '1.15rem', marginTop: 0, fontFamily: 'Space Grotesk, sans-serif', color: 'var(--color-text-primary)' }}>
-                Check your inbox.
-              </p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Sent to {email}</p>
-            </>
-          ) : (
-            <>
-              <h3 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.4rem)', fontWeight: 700, margin: '0 0 8px', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '-0.02em', color: 'var(--color-text-primary)' }}>
-                Get This Report in Your Inbox
-              </h3>
-              <p style={{ fontSize: 'clamp(0.85rem, 2vw, 0.95rem)', color: 'var(--color-text-secondary)', margin: '0 0 20px', fontWeight: 400 }}>
-                Save your personalized report with all calculations. No spam.
-              </p>
-              <form onSubmit={handleEmailSubmit} style={{ display: 'flex', gap: 10, maxWidth: 420, margin: '0 auto', flexWrap: 'wrap' }}>
-                <input
-                  type="email" placeholder="you@company.com" value={email}
-                  onChange={e => setEmail(e.target.value)} required disabled={emailStatus === 'sending'}
-                  style={{
-                    flex: 1, minWidth: 200, padding: '14px 18px', borderRadius: 'var(--radius-full)',
-                    background: 'var(--color-bg-base)', border: '1px solid var(--color-border-strong)',
-                    color: 'var(--color-text-primary)', fontSize: '0.95rem', outline: 'none',
-                    fontFamily: 'Inter, sans-serif',
-                  }}
-                />
-                <button type="submit" className="btn-primary" disabled={emailStatus === 'sending'} style={{ whiteSpace: 'nowrap', padding: '14px 28px' }}>
-                  {emailStatus === 'sending' ? 'Sending...' : 'Send Report'}
-                </button>
-              </form>
-              {emailStatus === 'error' && (
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-red)', marginTop: 8 }}>Something went wrong. Try again.</p>
-              )}
-            </>
-          )}
-        </motion.div>
+        {/* ── EMAIL CAPTURE — removed, no backend endpoint ── */}
 
         {/* ── DISCLAIMER ────────────────────────────────────── */}
         <div style={{
