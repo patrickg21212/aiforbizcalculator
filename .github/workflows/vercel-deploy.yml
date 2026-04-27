@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Enable Corepack (pnpm/yarn support)
+        run: corepack enable
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
