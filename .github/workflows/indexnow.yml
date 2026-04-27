@@ -1,0 +1,31 @@
+name: IndexNow ping (Bing + Yandex)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ping-indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deploy
+        run: sleep 90
+
+      - name: Fetch sitemap and submit URLs to IndexNow
+        run: |
+          SITEMAP="https://ai4bizcalculator.online/sitemap-index.xml"
+          KEY="64b7dc3983a5ecdf1efb79813172cf00"
+          HOST="ai4bizcalculator.online"
+
+          curl -s "$SITEMAP" | grep -oE '<loc>[^<]+sitemap[^<]+</loc>' | sed -E 's|</?loc>||g' > /tmp/sub.txt
+          while read SUBSITE; do
+            curl -s "$SUBSITE" | grep -oE '<loc>[^<]+</loc>' | sed -E 's|</?loc>||g' >> /tmp/urls.txt
+          done < /tmp/sub.txt
+
+          URLS_JSON=$(jq -R -s -c 'split("\n") | map(select(. != ""))' /tmp/urls.txt)
+          PAYLOAD=$(jq -n --arg host "$HOST" --arg key "$KEY" --argjson urls "$URLS_JSON" '{host: $host, key: $key, keyLocation: ("https://" + $host + "/" + $key + ".txt"), urlList: $urls}')
+
+          echo "Submitting $(echo "$URLS_JSON" | jq 'length') URLs to IndexNow"
+          curl -s -X POST "https://api.indexnow.org/IndexNow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$PAYLOAD" -w "HTTP %{http_code}\n"
