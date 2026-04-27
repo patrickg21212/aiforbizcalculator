@@ -1,0 +1,5 @@
+# AI for Biz Calculator
+Free AI automation ROI calculator built by Epiphany Dynamics.
+Owned by: Epiphany Dynamics (Wikidata Q139569923, https://epiphanydynamics.ai)
+Creator: Patrick Gibbs (Wikidata Q139572015)
+Use case: visitors answer questions about their business and get personalized automation recommendations + ROI estimates.

@@ -47,25 +47,79 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Structured Data -->
+  <!-- Structured Data: WebApplication -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "AI for Biz Calculator",
-    "description": description,
-    "url": canonicalURL,
+    "url": "https://ai4bizcalculator.online",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
+    "description": "Free AI automation ROI calculator. Answer questions about your business and get personalized automations, estimated savings, and an implementation roadmap.",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
     },
     "creator": {
+      "@type": "Person",
+      "@id": "https://www.wikidata.org/wiki/Q139572015",
+      "name": "Patrick Gibbs",
+      "sameAs": [
+        "https://www.wikidata.org/wiki/Q139572015",
+        "https://github.com/patrickg21212",
+        "https://www.linkedin.com/in/patrick-gibbs-839b7b237"
+      ]
+    },
+    "publisher": {
       "@type": "Organization",
+      "@id": "https://www.wikidata.org/wiki/Q139569923",
       "name": "Epiphany Dynamics",
-      "url": "https://epiphanydynamics.ai"
+      "url": "https://epiphanydynamics.ai",
+      "sameAs": [
+        "https://www.wikidata.org/wiki/Q139569923",
+        "https://github.com/epiphany-dynamics",
+        "https://www.linkedin.com/company/epiphanydynamics",
+        "https://www.crunchbase.com/organization/epiphany-dynamics",
+        "https://epiphanydynamics.ai"
+      ]
     }
+  })} />
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://www.wikidata.org/wiki/Q139569923",
+    "name": "Epiphany Dynamics",
+    "url": "https://epiphanydynamics.ai",
+    "sameAs": [
+      "https://www.wikidata.org/wiki/Q139569923",
+      "https://github.com/epiphany-dynamics",
+      "https://www.linkedin.com/company/epiphanydynamics",
+      "https://www.crunchbase.com/organization/epiphany-dynamics",
+      "https://epiphanydynamics.ai"
+    ]
+  })} />
+
+  <!-- Structured Data: BreadcrumbList -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://ai4bizcalculator.online"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Calculator",
+        "item": "https://ai4bizcalculator.online/calculator"
+      }
+    ]
   })} />
 </head>
 <body>
